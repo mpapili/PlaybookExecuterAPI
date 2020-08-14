@@ -29,12 +29,12 @@ type Car struct {
 var db *sql.DB
 
 func init() {
-	/*
-		connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable", user, password, dbname, host, port)
-		db, err := sql.Open("postgres", connStr)
-		checkErr(err)
-		fmt.Println(db)
-	*/
+	var err error
+
+	// connect to database
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable", user, password, dbname, host, port)
+	db, err = sql.Open("postgres", connStr)
+	checkErr(err)
 }
 
 func checkErr(err error) {
@@ -49,8 +49,6 @@ func main() {
 	var err error
 
 	// let's test playing with postgres!
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable", user, password, dbname, host, port)
-	db, err = sql.Open("postgres", connStr)
 	checkErr(err)
 
 	// test hitting database test table
@@ -83,17 +81,14 @@ func testFunc(http.ResponseWriter, *http.Request) {
 
 func getCars(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("running getCars")
 	var mycar Car // single book is of type book
 	cars := []Car{}
 
 	rows, err := db.Query("SELECT * FROM cars;")
 	checkErr(err)
-	fmt.Println("ran the query")
 	defer rows.Close() // close rows once this function is done
 
 	for rows.Next() {
-		fmt.Println("looking at another car")
 		err := rows.Scan(&mycar.ID, &mycar.Make)
 		checkErr(err)
 		cars = append(cars, mycar)
